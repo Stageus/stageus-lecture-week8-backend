@@ -18,8 +18,6 @@ export class AuthService {
       where: { id: loginDto.id },
     });
 
-    console.log(channel);
-
     if (!channel) {
       throw new UnauthorizedException('login failed');
     }
