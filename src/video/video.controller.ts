@@ -47,7 +47,6 @@ export class VideoController {
   }
 
   @Get('/all')
-  @UseGuards(AuthGuard)
   async getVideoAll(
     @Query() pagerble: VideoPagerbleDto,
   ): Promise<VideoEntity[]> {
