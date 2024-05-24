@@ -2,7 +2,7 @@ export class ChannelEntity {
   public idx: number;
   public name: string;
   public description: string;
-  public profileImg: string;
+  public profileImg?: string;
   public createdAt: Date;
 
   constructor(data: ChannelEntity) {

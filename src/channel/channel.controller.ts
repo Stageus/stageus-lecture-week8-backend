@@ -81,7 +81,7 @@ export class ChannelController {
   }
 
   //내구독목록 보기
-  @Get(':channelIdx/subscribe/all')
+  @Get('/subscribe/all')
   @UseGuards(AuthGuard)
   async getMySubscribeAll(
     @GetUser() loginUser: LoginUser,

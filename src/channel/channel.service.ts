@@ -49,6 +49,19 @@ export class ChannelService {
   }
 
   async createSubscribe(userIdx: number, channelIdx: number): Promise<void> {
+    console.log(userIdx);
+    console.log(channelIdx);
+
+    const existingSubscribe = await this.prisma.subscribe.findUnique({
+      where: {
+        subscriber_provider: { subscriber: userIdx, provider: channelIdx },
+      },
+    });
+
+    if (existingSubscribe) {
+      throw new ConflictException('alreay subscribe');
+    }
+
     await this.prisma.subscribe.create({
       data: { subscriber: userIdx, provider: channelIdx },
     });
