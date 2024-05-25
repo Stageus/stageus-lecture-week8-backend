@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SignUpDto } from './dto/SignUpDto';
 import { Prisma } from 'src/prisma/prisma.service';
 import { ChannelEntity } from './ChannelEntity';
@@ -27,6 +31,12 @@ export class ChannelService {
   }
 
   async getMyInfo(loginUser: LoginUser): Promise<ChannelEntity> {
+    let channel = await this.getChannelByIdx(loginUser.idx);
+
+    if (!channel) {
+      throw new NotFoundException('Not Found Channel');
+    }
+
     const channelData = await this.prisma.channel.findUnique({
       where: { idx: loginUser.idx },
     });
@@ -38,7 +48,13 @@ export class ChannelService {
     userIdx: number,
     file: Express.Multer.File,
   ): Promise<{ profileImg: string }> {
-    const channel = await this.prisma.channel.update({
+    let channel = await this.getChannelByIdx(userIdx);
+
+    if (!channel) {
+      throw new NotFoundException('Not Found Channel');
+    }
+
+    channel = await this.prisma.channel.update({
       where: { idx: userIdx },
       data: {
         profileImg: file.filename,
@@ -97,6 +113,10 @@ export class ChannelService {
     const channelData = await this.prisma.channel.findUnique({
       where: { idx: channelIdx },
     });
+
+    if (!channelData) {
+      throw new NotFoundException('Not Found Channel');
+    }
 
     return new ChannelEntity(channelData);
   }
