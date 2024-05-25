@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Video } from '@prisma/client';
 import { VideoEntity } from './VideoEntity';
 import { Prisma } from 'src/prisma/prisma.service';
@@ -37,6 +37,10 @@ export class VideoService {
     const videoData = await this.prisma.video.findUnique({
       where: { idx: videoIdx },
     });
+
+    if (!videoData) {
+      throw new NotFoundException('Not Found Video');
+    }
 
     return new VideoEntity(videoData);
   }
