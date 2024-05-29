@@ -22,10 +22,15 @@ import { GetUser } from 'src/auth/get-user.decorator';
 import { LoginUser } from 'src/auth/model/login-user.model';
 import { VideoEntity } from './VideoEntity';
 import { VideoPagerbleDto } from './dto/VideoPagerbleDto';
+import { ChannelService } from 'src/channel/channel.service';
+import { ChannelEntity } from 'src/channel/ChannelEntity';
 
 @Controller('video')
 export class VideoController {
-  constructor(private videoService: VideoService) {}
+  constructor(
+    private videoService: VideoService,
+    private channelService: ChannelService,
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard)
@@ -47,16 +52,30 @@ export class VideoController {
   }
 
   @Get('/all')
-  async getVideoAll(
-    @Query() pagerble: VideoPagerbleDto,
-  ): Promise<VideoEntity[]> {
+  async getVideoAll(@Query() pagerble: VideoPagerbleDto): Promise<
+    {
+      video: VideoEntity;
+      channel: ChannelEntity;
+    }[]
+  > {
     return await this.videoService.getVideoAll(pagerble.channel);
   }
 
   @Get(':videoIdx')
   async getVideoByIdx(
     @Param('videoIdx', ParseIntPipe) videoIdx: number,
-  ): Promise<VideoEntity> {
-    return await this.videoService.getVideoByIdx(videoIdx);
+  ): Promise<{
+    video: VideoEntity;
+    channel: ChannelEntity;
+  }> {
+    const videoEntity = await this.videoService.getVideoByIdx(videoIdx);
+
+    const channelEntity = await this.channelService.getChannelByIdx(
+      videoEntity.channelIdx,
+    );
+    return {
+      video: videoEntity,
+      channel: channelEntity,
+    };
   }
 }

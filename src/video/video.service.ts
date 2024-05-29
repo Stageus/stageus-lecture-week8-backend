@@ -3,6 +3,8 @@ import { Video } from '@prisma/client';
 import { VideoEntity } from './VideoEntity';
 import { Prisma } from 'src/prisma/prisma.service';
 import { CreateVideoDto } from './dto/createVideoDto';
+import { ChannelEntity } from 'src/channel/ChannelEntity';
+import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class VideoService {
@@ -25,12 +27,19 @@ export class VideoService {
     return new VideoEntity(videoData);
   }
 
-  async getVideoAll(channelIdx?: number): Promise<VideoEntity[]> {
+  async getVideoAll(
+    channelIdx?: number,
+  ): Promise<{ video: VideoEntity; channel: ChannelEntity }[]> {
     const videoData = await this.prisma.video.findMany({
       where: { channelIdx: channelIdx },
+      include: { Channel: true },
+      orderBy: { createdAt: 'desc' },
     });
 
-    return videoData.map((elem) => new VideoEntity(elem));
+    return videoData.map((elem) => ({
+      video: new VideoEntity(elem),
+      channel: new ChannelEntity(elem.Channel),
+    }));
   }
 
   async getVideoByIdx(videoIdx: number): Promise<VideoEntity> {
