@@ -38,6 +38,8 @@ export class VideoService {
       where: { idx: videoIdx },
     });
 
+    console.log('videoData: ', videoData);
+
     if (!videoData) {
       throw new NotFoundException('Not Found Video');
     }

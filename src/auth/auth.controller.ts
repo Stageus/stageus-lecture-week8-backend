@@ -1,4 +1,10 @@
-import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  ValidationPipe,
+} from '@nestjs/common';
 import { LoginDto } from './dto/LoginDto';
 import { AuthService } from './auth.service';
 
@@ -8,6 +14,7 @@ export class AuthController {
 
   //로그인
   @Post()
+  @HttpCode(200)
   signIn(@Body(ValidationPipe) loginDto: LoginDto) {
     return this.authService.signIn(loginDto);
   }

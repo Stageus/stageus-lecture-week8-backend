@@ -32,7 +32,6 @@ export class ChannelService {
 
   async getMyInfo(loginUser: LoginUser): Promise<ChannelEntity> {
     let channel = await this.getChannelByIdx(loginUser.idx);
-
     if (!channel) {
       throw new NotFoundException('Not Found Channel');
     }

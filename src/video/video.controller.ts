@@ -22,10 +22,14 @@ import { GetUser } from 'src/auth/get-user.decorator';
 import { LoginUser } from 'src/auth/model/login-user.model';
 import { VideoEntity } from './VideoEntity';
 import { VideoPagerbleDto } from './dto/VideoPagerbleDto';
+import { ChannelService } from 'src/channel/channel.service';
 
 @Controller('video')
 export class VideoController {
-  constructor(private videoService: VideoService) {}
+  constructor(
+    private videoService: VideoService,
+    private channelService: ChannelService,
+  ) {}
 
   @Post()
   @UseGuards(AuthGuard)
@@ -56,7 +60,22 @@ export class VideoController {
   @Get(':videoIdx')
   async getVideoByIdx(
     @Param('videoIdx', ParseIntPipe) videoIdx: number,
-  ): Promise<VideoEntity> {
-    return await this.videoService.getVideoByIdx(videoIdx);
+  ): Promise<{
+    video: VideoEntity;
+    channel: { channelIdx: number; name: string; profileImg: string };
+  }> {
+    const VideoEntity = await this.videoService.getVideoByIdx(videoIdx);
+
+    const channel = await this.channelService.getChannelByIdx(
+      VideoEntity.channelIdx,
+    );
+    return {
+      video: VideoEntity,
+      channel: {
+        channelIdx: channel.idx,
+        name: channel.name,
+        profileImg: channel.profileImg,
+      },
+    };
   }
 }
