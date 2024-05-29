@@ -23,6 +23,7 @@ import { LoginUser } from 'src/auth/model/login-user.model';
 import { VideoEntity } from './VideoEntity';
 import { VideoPagerbleDto } from './dto/VideoPagerbleDto';
 import { ChannelService } from 'src/channel/channel.service';
+import { ChannelEntity } from 'src/channel/ChannelEntity';
 
 @Controller('video')
 export class VideoController {
@@ -51,9 +52,12 @@ export class VideoController {
   }
 
   @Get('/all')
-  async getVideoAll(
-    @Query() pagerble: VideoPagerbleDto,
-  ): Promise<VideoEntity[]> {
+  async getVideoAll(@Query() pagerble: VideoPagerbleDto): Promise<
+    {
+      video: VideoEntity;
+      channel: ChannelEntity;
+    }[]
+  > {
     return await this.videoService.getVideoAll(pagerble.channel);
   }
 
@@ -62,20 +66,16 @@ export class VideoController {
     @Param('videoIdx', ParseIntPipe) videoIdx: number,
   ): Promise<{
     video: VideoEntity;
-    channel: { channelIdx: number; name: string; profileImg: string };
+    channel: ChannelEntity;
   }> {
-    const VideoEntity = await this.videoService.getVideoByIdx(videoIdx);
+    const videoEntity = await this.videoService.getVideoByIdx(videoIdx);
 
-    const channel = await this.channelService.getChannelByIdx(
-      VideoEntity.channelIdx,
+    const channelEntity = await this.channelService.getChannelByIdx(
+      videoEntity.channelIdx,
     );
     return {
-      video: VideoEntity,
-      channel: {
-        channelIdx: channel.idx,
-        name: channel.name,
-        profileImg: channel.profileImg,
-      },
+      video: videoEntity,
+      channel: channelEntity,
     };
   }
 }
